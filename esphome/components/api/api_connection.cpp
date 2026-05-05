@@ -34,6 +34,9 @@
 #ifdef USE_BLUETOOTH_PROXY
 #include "esphome/components/bluetooth_proxy/bluetooth_proxy.h"
 #endif
+#ifdef USE_BLE_SERVER
+#include "esphome/components/ble_server/ble_server.h"
+#endif
 #ifdef USE_CLIMATE
 #include "esphome/components/climate/climate_mode.h"
 #endif
@@ -173,6 +176,12 @@ APIConnection::~APIConnection() {
 #ifdef USE_BLUETOOTH_PROXY
   if (bluetooth_proxy::global_bluetooth_proxy->get_api_connection() == this) {
     bluetooth_proxy::global_bluetooth_proxy->unsubscribe_api_connection(this);
+  }
+#endif
+#ifdef USE_BLE_SERVER
+  if (ble_server::global_ble_server_component != nullptr &&
+      ble_server::global_ble_server_component->get_api_connection() == this) {
+    ble_server::global_ble_server_component->unsubscribe_api_connection(this);
   }
 #endif
 #ifdef USE_VOICE_ASSISTANT
@@ -1247,6 +1256,19 @@ void APIConnection::on_bluetooth_scanner_set_mode_request(const BluetoothScanner
 }
 void APIConnection::on_bluetooth_set_connection_params_request(const BluetoothSetConnectionParamsRequest &msg) {
   bluetooth_proxy::global_bluetooth_proxy->bluetooth_set_connection_params(msg);
+}
+#endif
+
+#ifdef USE_BLE_SERVER
+void APIConnection::on_subscribe_ble_server_frames_request() {
+  if (ble_server::global_ble_server_component != nullptr) {
+    ble_server::global_ble_server_component->subscribe_api_connection(this);
+  }
+}
+void APIConnection::on_ble_server_send_frame_request(const BleServerSendFrameRequest &msg) {
+  if (ble_server::global_ble_server_component != nullptr) {
+    ble_server::global_ble_server_component->on_frame_from_api(msg.data, msg.data_len);
+  }
 }
 #endif
 

@@ -2717,6 +2717,18 @@ const char *BluetoothSetConnectionParamsResponse::dump_to(DumpBuffer &out) const
   return out.c_str();
 }
 #endif
+#ifdef USE_BLE_SERVER
+const char *BleServerFrameResponse::dump_to(DumpBuffer &out) const {
+  MessageDumpHelper helper(out, ESPHOME_PSTR("BleServerFrameResponse"));
+  dump_bytes_field(out, ESPHOME_PSTR("data"), this->data_ptr_, this->data_len_);
+  return out.c_str();
+}
+const char *BleServerSendFrameRequest::dump_to(DumpBuffer &out) const {
+  MessageDumpHelper helper(out, ESPHOME_PSTR("BleServerSendFrameRequest"));
+  dump_bytes_field(out, ESPHOME_PSTR("data"), this->data, this->data_len);
+  return out.c_str();
+}
+#endif
 
 }  // namespace esphome::api
 

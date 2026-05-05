@@ -190,6 +190,10 @@ class APIConnection final : public APIServerConnectionBase {
   void on_bluetooth_set_connection_params_request(const BluetoothSetConnectionParamsRequest &msg);
 
 #endif
+#ifdef USE_BLE_SERVER
+  void on_subscribe_ble_server_frames_request();
+  void on_ble_server_send_frame_request(const BleServerSendFrameRequest &msg);
+#endif
 #ifdef USE_HOMEASSISTANT_TIME
   void send_time_request() {
     GetTimeRequest req;

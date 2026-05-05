@@ -76,6 +76,9 @@ service APIConnection {
   rpc serial_proxy_set_modem_pins(SerialProxySetModemPinsRequest) returns (void) {}
   rpc serial_proxy_get_modem_pins(SerialProxyGetModemPinsRequest) returns (void) {}
   rpc serial_proxy_request(SerialProxyRequest) returns (void) {}
+
+  rpc subscribe_ble_server_frames(SubscribeBleServerFramesRequest) returns (void) {}
+  rpc ble_server_send_frame(BleServerSendFrameRequest) returns (void) {}
 }
 
 
@@ -2731,4 +2734,33 @@ message BluetoothSetConnectionParamsResponse {
 
   uint64 address = 1;
   int32 error = 2;
+}
+
+// ==================== BLE SERVER ====================
+// Bridges raw byte frames between a BLE GATT client (e.g. an Android app) and
+// Home Assistant via the ESPHome native API. The on-wire chunking (1-byte
+// MORE/FINAL header + payload) is performed by the ble_server component on the
+// device side; these messages carry already-reassembled application frames.
+
+message SubscribeBleServerFramesRequest {
+  option (id) = 149;
+  option (source) = SOURCE_CLIENT;
+  option (ifdef) = "USE_BLE_SERVER";
+}
+
+message BleServerFrameResponse {
+  option (id) = 150;
+  option (source) = SOURCE_SERVER;
+  option (ifdef) = "USE_BLE_SERVER";
+  option (no_delay) = true;
+
+  bytes data = 1;
+}
+
+message BleServerSendFrameRequest {
+  option (id) = 151;
+  option (source) = SOURCE_CLIENT;
+  option (ifdef) = "USE_BLE_SERVER";
+
+  bytes data = 1;
 }

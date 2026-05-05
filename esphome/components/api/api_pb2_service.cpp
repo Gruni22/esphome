@@ -703,6 +703,26 @@ void APIConnection::read_message_(uint32_t msg_size, uint32_t msg_type, const ui
       break;
     }
 #endif
+#ifdef USE_BLE_SERVER
+    case 149 /* SubscribeBleServerFramesRequest is empty */: {
+#ifdef HAS_PROTO_MESSAGE_DUMP
+      this->log_receive_message_(LOG_STR("on_subscribe_ble_server_frames_request"));
+#endif
+      this->on_subscribe_ble_server_frames_request();
+      break;
+    }
+#endif
+#ifdef USE_BLE_SERVER
+    case BleServerSendFrameRequest::MESSAGE_TYPE: {
+      BleServerSendFrameRequest msg;
+      msg.decode(msg_data, msg_size);
+#ifdef HAS_PROTO_MESSAGE_DUMP
+      this->log_receive_message_(LOG_STR("on_ble_server_send_frame_request"), msg);
+#endif
+      this->on_ble_server_send_frame_request(msg);
+      break;
+    }
+#endif
     default:
       break;
   }
