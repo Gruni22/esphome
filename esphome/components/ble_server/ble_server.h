@@ -7,6 +7,7 @@
 #include "esphome/components/esp32_ble_server/ble_service.h"
 #include "esphome/core/component.h"
 
+#include <deque>
 #include <span>
 #include <string>
 #include <vector>
@@ -60,8 +61,13 @@ class BleServer : public Component {
   esp32_ble_server::BLEService *service_{nullptr};
   esp32_ble_server::BLECharacteristic *tx_char_{nullptr};
   esp32_ble_server::BLECharacteristic *rx_char_{nullptr};
+  bool service_setup_done_{false};
 
   std::vector<uint8_t> rx_assembly_;
+  // Outbound chunks waiting to go over BLE notify. Drained one-per-loop-tick
+  // from loop() so we don't blow past the ESP-IDF GATT TX queue when sending
+  // large responses (e.g., the ~31 KB ANS_DEVICES reply: 129 chunks).
+  std::deque<std::vector<uint8_t>> tx_queue_;
   api::APIConnection *subscriber_{nullptr};
 };
 
